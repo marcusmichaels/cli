@@ -568,6 +568,18 @@ module.exports = cls => class Reifier extends cls {
 
     const timeEnd = time.start('reify:trashOmits')
 
+    // Create omit set once, but only the types that are actually omitted
+    const omit = new Set()
+    if (this.#omitDev) {
+      omit.add('dev')
+    }
+    if (this.#omitOptional) {
+      omit.add('optional')
+    }
+    if (this.#omitPeer) {
+      omit.add('peer')
+    }
+
     for (const node of this.idealTree.inventory.values()) {
       const { top } = node
 
@@ -583,12 +595,7 @@ module.exports = cls => class Reifier extends cls {
       }
 
       // omit node if the dep type matches any omit flags that were set
-      if (
-        node.peer && this.#omitPeer ||
-        node.dev && this.#omitDev ||
-        node.optional && this.#omitOptional ||
-        node.devOptional && this.#omitOptional && this.#omitDev
-      ) {
+      if (node.shouldOmit(omit)) {
         this[_addNodeToTrashList](node)
       }
     }

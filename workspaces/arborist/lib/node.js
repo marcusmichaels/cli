@@ -489,6 +489,18 @@ class Node {
     return false
   }
 
+  shouldOmit (omitSet) {
+    // Accept either a Set or an array of omit types
+    const omit = omitSet instanceof Set ? omitSet : new Set(omitSet || [])
+
+    return (
+      this.peer && omit.has('peer') ||
+      this.dev && omit.has('dev') ||
+      this.optional && omit.has('optional') ||
+      this.devOptional && omit.has('optional') && omit.has('dev')
+    )
+  }
+
   getBundler (path = []) {
     // made a cycle, definitely not bundled!
     if (path.includes(this)) {

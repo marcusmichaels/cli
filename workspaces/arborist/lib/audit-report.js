@@ -317,12 +317,7 @@ const shouldAudit = (node, omit, filterSet) =>
   : node.isRoot ? false
   : filterSet && filterSet.size !== 0 && !filterSet.has(node) ? false
   : omit.size === 0 ? true
-  : !( // otherwise, just ensure we're not omitting this one
-    node.dev && omit.has('dev') ||
-    node.optional && omit.has('optional') ||
-    node.devOptional && omit.has('dev') && omit.has('optional') ||
-    node.peer && omit.has('peer')
-  )
+  : !node.shouldOmit(omit)
 
 const prepareBulkData = (tree, omit, filterSet) => {
   const payload = {}
